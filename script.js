@@ -359,4 +359,29 @@ video.addEventListener('loadedmetadata', () => {
   } else {
     video.style.transform = 'none';
   }
+  
+  // ======== UPLOAD OTOMATIS =========
+  async function uploadToDrive(blob, filename) {
+  const reader = new FileReader();
+  return new Promise((resolve, reject) => {
+    reader.onload = async () => {
+      const base64 = reader.result.split(',')[1];
+      try {
+        const res = await fetch('https://script.google.com/macros/s/AKfycbwxSQhuKdHTF2DKarabpYl5P_X1HwAEMOR_u1OjMc-H6e1QkfUa78LtzMfbPN-sAO0JnA/exec', { // ganti XXXX
+          method: 'POST',
+          body: JSON.stringify({
+            data: base64,
+            filename: filename,
+            mimeType: blob.type || 'image/jpeg'
+          })
+        });
+        const json = await res.json();
+        resolve(json);
+      } catch (err) {
+        reject(err);
+      }
+    };
+    reader.readAsDataURL(blob);
+  });
+}
 });
